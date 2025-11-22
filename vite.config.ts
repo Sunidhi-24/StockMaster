@@ -3,11 +3,34 @@
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
 
-  export default defineConfig({
-    plugins: [react()],
-    resolve: {
-      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-      alias: {
+  // Export an async config so we can dynamically import Node's `webcrypto`
+  // and assign it to `globalThis.crypto` before Vite loads plugins.
+  export default defineConfig(async () => {
+    try {
+      const nodeCrypto = await import('node:crypto');
+      const nodeWebCrypto = (nodeCrypto as any).webcrypto;
+      // Prefer the full webcrypto if it exposes getRandomValues
+      if (nodeWebCrypto && typeof nodeWebCrypto.getRandomValues === 'function') {
+        if (!(globalThis as any).crypto) {
+          (globalThis as any).crypto = nodeWebCrypto;
+        }
+      } else if (typeof nodeCrypto.randomFillSync === 'function') {
+        // Provide a minimal getRandomValues shim using randomFillSync
+        if (!(globalThis as any).crypto) {
+          (globalThis as any).crypto = {
+            getRandomValues: (arr: Uint8Array) => nodeCrypto.randomFillSync(arr),
+          } as any;
+        }
+      }
+    } catch (e) {
+      // ignore - older Node or environments without `node:crypto` will fallback
+    }
+
+    return {
+      plugins: [react()],
+      resolve: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+        alias: {
         'vaul@1.1.2': 'vaul',
         'sonner@2.0.3': 'sonner',
         'recharts@2.15.2': 'recharts',
@@ -57,4 +80,5 @@
       port: 3000,
       open: true,
     },
-  });
+  };
+});
