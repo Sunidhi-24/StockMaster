@@ -13,6 +13,7 @@ export function WarehousePage({ onNavigate }: WarehousePageProps) {
   const [name, setName] = useState('');
   const [shortCode, setShortCode] = useState('');
   const [address, setAddress] = useState('');
+  const [saveMessage, setSaveMessage] = useState('');
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -23,12 +24,14 @@ export function WarehousePage({ onNavigate }: WarehousePageProps) {
     e.preventDefault();
     // Handle save logic here
     console.log('Saving warehouse:', { name, shortCode, address });
+    setSaveMessage('Saved Successfully');
   };
 
   const handleCancel = () => {
     setName('');
     setShortCode('');
     setAddress('');
+    setSaveMessage('');
   };
 
   return (
@@ -141,6 +144,13 @@ export function WarehousePage({ onNavigate }: WarehousePageProps) {
             </div>
           </form>
         </div>
+
+        {/* Success Message */}
+        {saveMessage && (
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-800">{saveMessage}</p>
+          </div>
+        )}
       </div>
     </div>
   );

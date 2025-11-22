@@ -13,6 +13,7 @@ export function LocationPage({ onNavigate }: LocationPageProps) {
   const [name, setName] = useState('');
   const [shortCode, setShortCode] = useState('');
   const [warehouse, setWarehouse] = useState('');
+  const [saveMessage, setSaveMessage] = useState('');
 
   // Mock warehouse data - in a real app, this would come from an API
   const warehouses = [
@@ -30,12 +31,14 @@ export function LocationPage({ onNavigate }: LocationPageProps) {
     e.preventDefault();
     // Handle save logic here
     console.log('Saving location:', { name, shortCode, warehouse });
+    setSaveMessage('Saved Successfully');
   };
 
   const handleCancel = () => {
     setName('');
     setShortCode('');
     setWarehouse('');
+    setSaveMessage('');
   };
 
   return (
@@ -160,6 +163,13 @@ export function LocationPage({ onNavigate }: LocationPageProps) {
             </div>
           </form>
         </div>
+
+        {/* Success Message */}
+        {saveMessage && (
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-800">{saveMessage}</p>
+          </div>
+        )}
       </div>
     </div>
   );
